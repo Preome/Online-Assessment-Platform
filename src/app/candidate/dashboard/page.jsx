@@ -2,10 +2,16 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Card from '@/components/ui/Card';
+import Button from '@/components/ui/Button';
+import Input from '@/components/ui/Input';
 
 export default function CandidateDashboard() {
   const router = useRouter();
   const [candidateName, setCandidateName] = useState('');
+  const [query, setQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const pageSize = 6;
 
   useEffect(() => {
     const email = localStorage.getItem('candidateEmail');
@@ -15,35 +21,61 @@ export default function CandidateDashboard() {
     setCandidateName(localStorage.getItem('candidateName') || 'Candidate');
   }, [router]);
 
+  // mock exams with more display fields
   const exams = [
     {
       id: 1,
-      title: "Psychometric Test for Management Trainee Officer",
+      title: 'Psychometric Test for Management Trainee Officer',
       duration: 30,
       questions: 20,
       negativeMarking: -0.25,
-      totalMarks: 100
+      totalMarks: 100,
+      questionSets: 3,
+      totalCandidates: 10000
     },
     {
       id: 2,
-      title: "Technical Assessment for Software Engineer",
-      duration: 45,
-      questions: 30,
-      negativeMarking: -0.5,
-      totalMarks: 150
+      title: 'Psychometric Test for Management Trainee Officer',
+      duration: 30,
+      questions: 20,
+      negativeMarking: -0.25,
+      totalMarks: 100,
+      questionSets: 3,
+      totalCandidates: 10000
     },
     {
       id: 3,
-      title: "English Proficiency Test",
-      duration: 25,
-      questions: 15,
+      title: 'Psychometric Test for Management Trainee Officer',
+      duration: 30,
+      questions: 20,
       negativeMarking: -0.25,
-      totalMarks: 75
+      totalMarks: 100,
+      questionSets: null,
+      totalCandidates: null
+    },
+    {
+      id: 4,
+      title: 'Psychometric Test for Management Trainee Officer',
+      duration: 30,
+      questions: 20,
+      negativeMarking: -0.25,
+      totalMarks: 100,
+      questionSets: 3,
+      totalCandidates: 10000
     }
   ];
 
+  const filtered = exams.filter((e) => e.title.toLowerCase().includes(query.toLowerCase()));
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const paged = filtered.slice((page - 1) * pageSize, page * pageSize);
+
   const startExam = (exam) => {
-    localStorage.setItem('currentExam', JSON.stringify(exam));
+    // attach mock questions if not present
+    const examWithQuestions = {
+      ...exam,
+      questionsData: generateMockQuestions(exam.questions || 20),
+    };
+    localStorage.setItem('currentExam', JSON.stringify(examWithQuestions));
     router.push(`/candidate/exam/${exam.id}`);
   };
 
@@ -56,8 +88,9 @@ export default function CandidateDashboard() {
             <img src="/logo.png" alt="Logo" className="w-8 h-8" />
             <span className="font-bold text-gray-800">AKJ RESOURCE</span>
           </div>
-          <div className="text-sm text-gray-600">
-            Welcome, {candidateName}
+          <div className="flex items-center gap-4">
+            <div className="text-sm text-gray-600">Welcome, {candidateName}</div>
+            <Input value={query} onChange={(e) => { setQuery(e.target.value); setPage(1); }} placeholder="Search tests" />
           </div>
         </div>
       </div>
@@ -66,24 +99,54 @@ export default function CandidateDashboard() {
       <div className="flex-1 max-w-6xl mx-auto px-4 pt-24 pb-8 w-full">
         <h1 className="text-2xl font-bold text-gray-800 mb-6">Dashboard</h1>
         <h2 className="text-lg font-semibold text-gray-700 mb-4">Online Tests</h2>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {exams.map((exam) => (
-            <div key={exam.id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+          {paged.map((exam) => (
+            <Card key={exam.id} className="hover:shadow-lg transition-shadow">
               <h3 className="font-semibold text-md mb-3 text-gray-800">{exam.title}</h3>
-              <div className="space-y-2 text-sm text-gray-600 mb-4">
-                <p>Duration: {exam.duration} min</p>
-                <p>Question: {exam.questions}</p>
-                <p>Negative Marking: {exam.negativeMarking}/wrong</p>
+
+              <div className="flex flex-wrap items-center gap-6 text-sm text-gray-600 mb-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-400">⏱</span>
+                  <span>Duration: {exam.duration} min</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-400">🧾</span>
+                  <span>Question: {exam.questions}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-400">⚠️</span>
+                  <span>Negative Marking: {exam.negativeMarking}/wrong</span>
+                </div>
               </div>
-              <button
-                onClick={() => startExam(exam)}
-                className="w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
-              >
-                Start Exam
-              </button>
-            </div>
+
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-gray-500">
+                  <div>Candidates: {exam.totalCandidates?.toLocaleString() || 'Not Set'}</div>
+                  <div>Question Set: {exam.questionSets || 'Not Set'}</div>
+                </div>
+                <div>
+                  <Button onClick={() => startExam(exam)} variant="outline" className="text-purple-600 border-purple-300 hover:bg-purple-50">
+                    Start
+                  </Button>
+                </div>
+              </div>
+            </Card>
           ))}
+        </div>
+
+        {/* Pagination */}
+        <div className="mt-6 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Button onClick={() => setPage((p) => Math.max(1, p - 1))} className="px-3">&lt;</Button>
+            <div className="px-3 py-1 bg-white border rounded">{page}</div>
+            <Button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} className="px-3">&gt;</Button>
+          </div>
+          <div className="text-sm text-gray-600">Online Test Per Page
+            <select value={pageSize} disabled className="ml-2 bg-white border rounded px-2 py-1 text-sm">
+              <option>6</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -102,4 +165,35 @@ export default function CandidateDashboard() {
       </div>
     </div>
   );
+}
+
+function generateMockQuestions(count) {
+  const samples = [
+    {
+      text: 'Which of the following indicators is used to measure market volatility?',
+      options: ['Relative Strength Index (RSI)', 'Moving Average Convergence Divergence (MACD)', 'Bollinger Bands', 'Fibonacci Retracement'],
+      correct: 2
+    },
+    {
+      text: 'What does CPU stand for?',
+      options: ['Central Processing Unit', 'Computer Personal Unit', 'Central Program Utility', 'Core Processing Utility'],
+      correct: 0
+    },
+    {
+      text: 'Which of the following is a programming language?',
+      options: ['HTML', 'CSS', 'JavaScript', 'XML'],
+      correct: 2
+    },
+    {
+      text: 'What is the capital of France?',
+      options: ['London', 'Berlin', 'Paris', 'Madrid'],
+      correct: 2
+    }
+  ];
+
+  const result = [];
+  for (let i = 0; i < count; i++) {
+    result.push({ id: i + 1, ...samples[i % samples.length] });
+  }
+  return result;
 }
