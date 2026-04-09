@@ -20,12 +20,20 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Header with Logo */}
       <div className="bg-white shadow-md px-6 py-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <h1 className="text-xl font-bold text-gray-800">AKIJ RESOURCE</h1>
+          <div className="flex items-center gap-3">
+            <img 
+              src="/logo.png" 
+              alt="Akij Resource Logo" 
+              className="w-10 h-10 object-contain"
+            />
+            <h1 className="text-xl font-bold text-gray-800">AKIJ RESOURCE</h1>
+          </div>
           <button 
             onClick={() => router.push('/create-test')}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
           >
             + Create New Test
           </button>
@@ -37,10 +45,13 @@ export default function DashboardPage() {
         
         {exams.length === 0 ? (
           <div className="bg-white rounded-lg shadow-md p-12 text-center">
-            <div className="text-gray-400 mb-4">
-              <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
+            {/* Empty State Image */}
+            <div className="mb-6">
+              <img 
+                src="/empty-state.png" 
+                alt="No tests available" 
+                className="w-64 h-64 mx-auto object-contain"
+              />
             </div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">No Online Test Available</h3>
             <p className="text-gray-500">Currently, there are no online tests available. Please check back later for updates.</p>
@@ -56,7 +67,7 @@ export default function DashboardPage() {
                   <p>Exam Slots: {exam.totalSlots || 'Not Set'}</p>
                 </div>
                 <button 
-                  className="w-full border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50"
+                  className="w-full border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors"
                   onClick={() => alert('View Candidates - Coming Soon')}
                 >
                   View Candidates
