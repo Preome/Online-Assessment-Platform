@@ -83,7 +83,7 @@ export default function CreateTestPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-gray-50">
       {/* Header */}
       <div className="bg-white shadow-sm px-6 py-4">
         <div className="max-w-6xl mx-auto">
@@ -97,8 +97,8 @@ export default function CreateTestPage() {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      {/* Main Content - grows to push footer down */}
+      <div className="flex-1 max-w-6xl mx-auto px-4 py-8 w-full">
         <div className="bg-white rounded-lg shadow-md">
           {/* Tabs */}
           <div className="border-b px-6 pt-4">
@@ -385,8 +385,8 @@ export default function CreateTestPage() {
         />
       </Modal>
 
-      {/* Footer */}
-      <div className="bg-[#1a0933] text-white text-sm py-4 mt-8">
+      {/* Footer - Now at the bottom */}
+      <div className="bg-[#1a0933] text-white text-sm py-4">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
