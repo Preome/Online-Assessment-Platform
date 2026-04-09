@@ -72,6 +72,12 @@ export default function DashboardPage() {
                 >
                   View Candidates
                 </button>
+                <button 
+                  className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors mt-2"
+                  onClick={() => router.push(`/manage-test/${exam.id}`)}
+                >
+                  Manage Test
+                </button>
               </div>
             ))}
           </div>
