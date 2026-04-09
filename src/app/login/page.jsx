@@ -24,12 +24,31 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
       
-      {/* Fixed Header */}
-      <div className="w-full bg-white shadow-sm py-4 text-center font-semibold text-gray-700 fixed top-0 left-0 z-50">
-        Akij Resource
+      {/* Fixed Header with Logo */}
+      <div className="w-full bg-white shadow-sm py-3 fixed top-0 left-0 z-50">
+        <div className="relative max-w-6xl mx-auto px-4 flex items-center justify-between">
+          {/* Logo Section - Left */}
+          <div className="flex items-center gap-3">
+            <div className="w-16 h-16">
+              <img 
+                src="/logo.png" 
+                alt="Akij Resource Logo"
+                className="w-full h-full object-contain"
+              />
+            </div>
+          </div>
+          
+          {/* Centered Title */}
+          <div className="absolute left-1/2 transform -translate-x-1/2">
+            <span className="font-semibold text-gray-700 text-lg">Akij Resource</span>
+          </div>
+          
+          {/* Empty div for balance */}
+          <div className="w-16"></div>
+        </div>
       </div>
 
-      {/* Main Content with padding top to account for fixed header */}
+      {/* Main Content */}
       <div className="flex-1 flex items-center justify-center pt-20">
         <div className="bg-white rounded-xl shadow-md w-full max-w-md p-8">
           
@@ -79,10 +98,22 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Bottom Footer */}
+      {/* Footer with Logo */}
       <div className="bg-[#1a0933] text-white text-sm py-4 mt-auto">
         <div className="max-w-5xl mx-auto flex justify-between items-center px-4">
-          <p>Powered by AKIJ RESOURCE</p>
+          {/* Left side - Logo and Powered by */}
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8">
+              <img 
+                src="/logo.png" 
+                alt="Akij Resource Logo"
+                className="w-full h-full object-contain"
+              />
+            </div>
+            <p>Powered by AKIJ RESOURCE</p>
+          </div>
+          
+          {/* Right side - Contact info */}
           <p>Helpline: +88 011020202505 | support@akij.work</p>
         </div>
       </div>
