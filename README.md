@@ -17,7 +17,7 @@ A full-stack online assessment/exam platform built with Next.js 14 (App Router),
 [Link ](https://loom.com/share/...) 
 
 ## 🔗 Video Demo
-[Watch demo ](https://loom.com/share/...) 
+[Watch demo ](https://drive.google.com/file/d/1dR9L3QT1AvyKAfnBxGw1HgjOYoy11rNE/view?usp=drive_link) 
 
 ## 📋 Setup Instructions
 
