@@ -89,14 +89,25 @@ export default function CandidateDashboard() {
             <span className="font-bold text-gray-800">AKJ RESOURCE</span>
           </div>
           <div className="flex items-center gap-4">
-            <div className="text-sm text-gray-600">Welcome, {candidateName}</div>
-            <Input value={query} onChange={(e) => { setQuery(e.target.value); setPage(1); }} placeholder="Search tests" />
+            <div className="flex items-center gap-3 bg-white px-3 py-1 rounded">
+              <img src="/logo.png" alt="User" className="w-8 h-8 rounded-full object-cover" />
+              <div className="text-left">
+                <div className="text-sm font-medium">{candidateName || 'Candidate'}</div>
+                <div className="text-xs text-gray-500">Ref. ID - 1234341</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="flex-1 max-w-6xl mx-auto px-4 pt-24 pb-8 w-full">
+        {/* Toolbar below header: centered wide search input */}
+        <div className="mb-6 flex items-center justify-center">
+          <div className="w-full max-w-4xl">
+            <Input value={query} onChange={(e) => { setQuery(e.target.value); setPage(1); }} placeholder="Search tests" />
+          </div>
+        </div>
         <h1 className="text-2xl font-bold text-gray-800 mb-6">Dashboard</h1>
         <h2 className="text-lg font-semibold text-gray-700 mb-4">Online Tests</h2>
 

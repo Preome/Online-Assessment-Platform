@@ -10,6 +10,7 @@ import Input from '@/components/ui/Input';
 
 export default function DashboardPage() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const user = useAuthStore((state) => state.user);
   const exams = useExamStore((state) => state.exams);
   const router = useRouter();
 
@@ -42,11 +43,29 @@ export default function DashboardPage() {
             <h1 className="text-xl font-bold text-gray-800">AKIJ RESOURCE</h1>
           </div>
           <div className="flex items-center gap-4">
+            {/* User badge on header (right) */}
+            <div className="flex items-center gap-3 bg-white px-3 py-1 rounded">
+              <img src="/logo.png" alt="User" className="w-8 h-8 rounded-full object-cover" />
+              <div className="text-left">
+                <div className="text-sm font-medium">{user?.email || 'Admin'}</div>
+                <div className="text-xs text-gray-500">Ref. ID - 18101121</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Toolbar below header: search + create button */}
+        <div className="flex items-center justify-center mb-6 gap-4">
+          <div className="w-full max-w-4xl">
             <Input
               value={query}
               onChange={(e) => { setQuery(e.target.value); setPage(1); }}
               placeholder="Search by exam title"
             />
+          </div>
+          <div className="hidden md:block">
             <Button
               onClick={() => router.push('/create-test')}
               className="bg-purple-600 hover:bg-purple-700"
@@ -55,9 +74,6 @@ export default function DashboardPage() {
             </Button>
           </div>
         </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 py-8">
         <h2 className="text-2xl font-bold text-gray-800 mb-6">Online Tests</h2>
 
         {exams.length === 0 ? (
