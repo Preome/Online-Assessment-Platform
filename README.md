@@ -13,8 +13,9 @@ A full-stack online assessment/exam platform built with Next.js 14 (App Router),
 - Secure exam env: Visibility API for tab switches, fullscreen enforcement, local progress save (localStorage)
 - Responsive UI with shadcn/ui-inspired components (Button, Card, Input, Modal)
 
-## 🔗 Live Link
+## 🔗 Live Link : Employer login
 [Employer Login ](online-assessment-platform-rho.vercel.app) 
+## 🔗 Live Link : Candidate login
 [Candidate Login ](https://online-assessment-platform-rho.vercel.app/candidate/login) 
 
 ## 🔗 Video Demo
