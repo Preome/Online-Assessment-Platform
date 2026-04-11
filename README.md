@@ -74,13 +74,53 @@ Benefits: Faster iteration, realtime data, integrated testing.
 
 
 
+
 ## 📂 Project Structure
 ```
-src/
-├── app/          # Pages: login, dashboard, create-test, candidate/exam/[id]
-├── components/   # UI (shadcn-inspired), forms, layout
-├── store/        # Zustand: auth, exam
-└── lib/          # Validation schemas
+.
+├── package.json
+├── next.config.js
+├── tailwind.config.js
+├── postcss.config.js
+├── jsconfig.json
+├── public/
+│   ├── logo.png
+│   ├── tick.png
+│   └── empty-state.png
+└── src/
+	├── app/
+	│   ├── layout.jsx
+	│   ├── global.css
+	│   ├── page.jsx
+	│   ├── create-test/
+	│   │   └── page.jsx
+	│   ├── dashboard/
+	│   │   └── page.jsx
+	│   ├── login/
+	│   │   └── page.jsx
+	│   ├── manage-test/
+	│   │   └── [id]/page.jsx
+	│   └── candidate/
+	│       ├── dashboard/page.jsx
+	│       ├── exam/[id]/page.jsx
+	│       ├── login/page.jsx
+	│       └── result/page.jsx
+	├── components/
+	│   ├── forms/
+	│   │   ├── QuestionForm.jsx
+	│   │   └── BasicInfoForm.jsx
+	│   ├── layout/
+	│   │   └── Navbar.jsx
+	│   └── ui/
+	│       ├── Button.jsx
+	│       ├── Card.jsx
+	│       ├── Input.jsx
+	│       └── Modal.jsx
+	├── lib/
+	│   └── validation.js
+	└── store/
+		├── authStore.js
+		└── examStore.js
 
 ```
 
