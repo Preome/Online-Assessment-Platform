@@ -16,7 +16,7 @@ A full-stack online assessment/exam platform built with Next.js 14 (App Router),
 ## 🔗 Live Link : Employer login
 [Employer Login ](https://online-assessment-platform-rho.vercel.app/login) 
 **Login Credentials:**
-- Admin: `admin@akij.com` / `password123`
+- Employer: `admin@akij.com` / `password123`
 
 ## 🔗 Live Link : Candidate login
 [Candidate Login ](https://online-assessment-platform-rho.vercel.app/candidate/login) 
