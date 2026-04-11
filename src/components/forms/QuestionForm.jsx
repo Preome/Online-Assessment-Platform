@@ -1,10 +1,15 @@
+"use client";
+
 import { useState, useRef, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
 
+// Dynamically import ReactQuill on the client to avoid server-side `document` errors
+const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
+
 export default function QuestionForm({ onSubmit, onCancel, initialData = null }) {
-  const titleRef = useRef(null);
-  const activeEditable = useRef(null);
+  // Using ReactQuill editors for title and options for reliable RTL + formatting
 
   const createOption = (content = '') => ({ id: `opt-${Math.random().toString(36).slice(2,9)}`, content });
 
@@ -30,10 +35,79 @@ export default function QuestionForm({ onSubmit, onCancel, initialData = null })
     };
   });
 
+  const quillModules = { toolbar: [['bold','italic'], [{ 'align': [] }]] };
+  const quillFormats = ['bold','italic','align','direction'];
+
+  const titleQuillRef = useRef(null);
+  const optionQuillRefs = useRef({});
+
+  // Ensure Quill editor roots are set to RTL and right-aligned so caret behaves correctly
   useEffect(() => {
-    if (titleRef.current && question.title) {
-      titleRef.current.innerHTML = question.title;
+    const setRtlOnQuill = (quillRef) => {
+      try {
+        let root = null;
+        if (quillRef && typeof quillRef.getEditor === 'function') {
+          root = quillRef.getEditor().root;
+        } else if (quillRef && quillRef.editor && quillRef.editor.root) {
+          root = quillRef.editor.root;
+        }
+        if (root) {
+          root.setAttribute('dir', 'rtl');
+          root.style.direction = 'rtl';
+          root.style.textAlign = 'right';
+          root.style.unicodeBidi = 'isolate-override';
+        }
+      } catch (e) {
+        // noop
+      }
+    };
+
+    setRtlOnQuill(titleQuillRef.current);
+    Object.values(optionQuillRefs.current || {}).forEach(setRtlOnQuill);
+  }, [question.options.length]);
+
+  // Normalize punctuation so sentence-ending marks stay on the RTL side.
+  // Appends a Right-to-Left Mark (U+200F) after common punctuation if not present.
+  const normalizePunctuation = (html) => {
+    if (!html) return html;
+    try {
+      return html.replace(/([?!:;,\.])(?!(\u200F))/g, '$1\u200F');
+    } catch (e) {
+      return html;
     }
+  };
+
+  // Walk text nodes inside a root DOM node and append RLM after punctuation.
+  const addRLMToTextNodes = (root) => {
+    if (!root) return;
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach((textNode) => {
+      try {
+        // replace only if punctuation not already followed by RLM
+        textNode.nodeValue = textNode.nodeValue.replace(/([?!:;,\.])(?!(\u200F))/g, '$1\u200F');
+      } catch (e) {
+        // ignore
+      }
+    });
+  };
+
+  // Ensure Quill editor's DOM contains RLM marks where needed
+  const ensureRLMInQuill = (quillRef) => {
+    try {
+      if (!quillRef) return;
+      const editor = typeof quillRef.getEditor === 'function' ? quillRef.getEditor() : (quillRef.editor || null);
+      const root = editor && editor.root ? editor.root : null;
+      if (root) addRLMToTextNodes(root);
+    } catch (e) {
+      // noop
+    }
+  };
+
+  useEffect(() => {
+    // load Quill styles on client only
+    import('react-quill/dist/quill.snow.css').catch(() => {});
   }, []);
   
   const handleAddOption = () => {
@@ -44,11 +118,14 @@ export default function QuestionForm({ onSubmit, onCancel, initialData = null })
   };
   
   const handleRemoveOption = (index) => {
-    setQuestion(prev => ({
-      ...prev,
-      options: prev.options.filter((_, i) => i !== index),
-      correctAnswers: prev.correctAnswers.filter(id => prev.options[index]?.id !== id)
-    }));
+    setQuestion(prev => {
+      const removedId = prev.options[index]?.id;
+      const newOptions = prev.options.filter((_, i) => i !== index);
+      const newCorrect = prev.correctAnswers.filter(id => removedId !== id);
+      // cleanup quill ref
+      if (removedId && optionQuillRefs.current) delete optionQuillRefs.current[removedId];
+      return { ...prev, options: newOptions, correctAnswers: newCorrect };
+    });
   };
   
   const handleOptionChange = (index, value) => {
@@ -68,28 +145,37 @@ export default function QuestionForm({ onSubmit, onCancel, initialData = null })
     }
   };
 
-  const execCommand = (cmd, value = null) => {
-    try {
-      document.execCommand(cmd, false, value);
-      // keep focus on active editable
-      activeEditable.current?.focus();
-    } catch (e) {
-      // noop
-    }
-  };
-  
   const handleSubmit = (e) => {
     e.preventDefault();
-    // ensure title is synced
-    const titleHtml = titleRef.current?.innerHTML || question.title || '';
-    if (titleHtml.replace(/<[^>]*>/g, '').trim()) {
-      onSubmit({ ...question, title: titleHtml }, false);
+    // ensure title has non-empty text
+    const strip = (html) => (html || '').replace(/<[^>]*>/g, '').trim();
+    const titleHtml = question.title || '';
+    if (strip(titleHtml)) {
+      // first, make sure editor DOMs have RLM inserted so punctuation lands correctly
+      ensureRLMInQuill(titleQuillRef.current);
+      Object.values(optionQuillRefs.current || {}).forEach(ensureRLMInQuill);
+
+      const payload = {
+        ...question,
+        title: normalizePunctuation(titleQuillRef.current ? (titleQuillRef.current.getEditor ? titleQuillRef.current.getEditor().root.innerHTML : question.title) : titleHtml),
+        options: question.options.map(o => ({ ...o, content: normalizePunctuation((optionQuillRefs.current[o.id] && optionQuillRefs.current[o.id].getEditor) ? optionQuillRefs.current[o.id].getEditor().root.innerHTML : o.content) }))
+      };
+      onSubmit(payload, false);
     }
   };
 
   const handleSaveAddMore = () => {
-    if (question.title.trim()) {
-      onSubmit(question, true);
+    const strip = (html) => (html || '').replace(/<[^>]*>/g, '').trim();
+    if (strip(question.title)) {
+      ensureRLMInQuill(titleQuillRef.current);
+      Object.values(optionQuillRefs.current || {}).forEach(ensureRLMInQuill);
+
+      const payload = {
+        ...question,
+        title: normalizePunctuation(titleQuillRef.current ? (titleQuillRef.current.getEditor ? titleQuillRef.current.getEditor().root.innerHTML : question.title) : question.title),
+        options: question.options.map(o => ({ ...o, content: normalizePunctuation((optionQuillRefs.current[o.id] && optionQuillRefs.current[o.id].getEditor) ? optionQuillRefs.current[o.id].getEditor().root.innerHTML : o.content) }))
+      };
+      onSubmit(payload, true);
     }
   };
   
@@ -98,19 +184,17 @@ export default function QuestionForm({ onSubmit, onCancel, initialData = null })
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">Question Title</label>
         <div className="border border-gray-300 rounded-lg p-3 bg-white">
-          <div className="flex items-center gap-2 mb-2">
-            <button type="button" className="px-2 py-1 bg-gray-100 rounded text-xs" onClick={() => execCommand('formatBlock', '<p>')}>Normal</button>
-            <button type="button" className="px-2 py-1 bg-gray-100 rounded text-xs font-semibold" onClick={() => execCommand('bold')}>B</button>
-            <button type="button" className="px-2 py-1 bg-gray-100 rounded text-xs italic" onClick={() => execCommand('italic')}>I</button>
+          <div dir="rtl" className="rtl-isolate">
+            <ReactQuill
+              ref={(el) => { titleQuillRef.current = el; }}
+              value={question.title}
+              onChange={(val) => setQuestion(prev => ({ ...prev, title: val }))}
+              theme="snow"
+              modules={quillModules}
+              formats={quillFormats}
+              placeholder="Enter your question"
+            />
           </div>
-          <div
-            ref={titleRef}
-            contentEditable
-            onInput={() => setQuestion(prev => ({ ...prev, title: titleRef.current?.innerHTML || '' }))}
-            onFocus={(e) => (activeEditable.current = e.currentTarget)}
-            className="min-h-[80px] p-2 outline-none text-gray-800"
-            dangerouslySetInnerHTML={{ __html: question.title }}
-          />
         </div>
       </div>
       
@@ -149,9 +233,7 @@ export default function QuestionForm({ onSubmit, onCancel, initialData = null })
                 <div className="flex-1">
                   <div className="mb-2">
                     <div className="flex items-center gap-2 text-xs text-gray-500">
-                      <button type="button" className="px-2 py-1 bg-gray-100 rounded" onClick={() => { activeEditable.current = document.getElementById(option.id); execCommand('formatBlock','<p>'); }}>Normal text</button>
-                      <button type="button" className="px-2 py-1 bg-gray-100 rounded font-semibold" onClick={() => { activeEditable.current = document.getElementById(option.id); execCommand('bold'); }}>B</button>
-                      <button type="button" className="px-2 py-1 bg-gray-100 rounded italic" onClick={() => { activeEditable.current = document.getElementById(option.id); execCommand('italic'); }}>I</button>
+                      {/* toolbar provided inside each editor */}
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
@@ -162,14 +244,18 @@ export default function QuestionForm({ onSubmit, onCancel, initialData = null })
                       onChange={() => handleCorrectAnswerChange(option.id)}
                       className="w-4 h-4 mt-1"
                     />
-                    <div
-                      id={option.id}
-                      contentEditable
-                      onInput={() => handleOptionChange(index, document.getElementById(option.id)?.innerHTML || '')}
-                      onFocus={(e) => (activeEditable.current = e.currentTarget)}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg min-h-[44px]"
-                      dangerouslySetInnerHTML={{ __html: option.content }}
-                    />
+                    <div className="flex-1 border border-gray-300 rounded-lg min-h-[44px]">
+                      <div dir="rtl" className="rtl-isolate">
+                        <ReactQuill
+                          ref={(el) => { optionQuillRefs.current[option.id] = el; }}
+                          value={option.content}
+                          onChange={(val) => handleOptionChange(index, val)}
+                          theme="snow"
+                          modules={quillModules}
+                          formats={quillFormats}
+                        />
+                      </div>
+                    </div>
                     {question.options.length > 2 && (
                       <button
                         type="button"

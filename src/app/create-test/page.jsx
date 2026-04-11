@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import useAuthStore from '@/store/authStore';
 import useExamStore from '@/store/examStore';
@@ -21,10 +21,12 @@ export default function CreateTestPage() {
   const [editingQuestion, setEditingQuestion] = useState(null);
   const [formKey, setFormKey] = useState(0);
 
-  if (!isAuthenticated) {
-    router.push('/login');
-    return null;
-  }
+  // Redirect unauthenticated users on the client after mount
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push('/login');
+    }
+  }, [isAuthenticated, router]);
 
   const handleBasicInfoSubmit = (data) => {
     setBasicInfo(data);
@@ -326,7 +328,7 @@ export default function CreateTestPage() {
                           </div>
                         </div>
 
-                        <h3 className="text-gray-800 mb-3">{question.title}</h3>
+                        <h3 className="text-gray-800 mb-3 rtl-isolate" dangerouslySetInnerHTML={{ __html: question.title }} />
 
                         {/* Render options for radio/checkbox */}
                         {(question.type === 'radio' || question.type === 'checkbox') && question.options && (
@@ -340,7 +342,7 @@ export default function CreateTestPage() {
                                   <span className="text-gray-600">
                                     {question.type === 'radio' ? '◉' : '☐'}
                                   </span>
-                                  <span className="text-gray-700" dangerouslySetInnerHTML={{ __html: `${String.fromCharCode(65 + optIndex)}. ${content}` }} />
+                                  <span dir="rtl" className="text-gray-700 rtl-isolate" dangerouslySetInnerHTML={{ __html: `${String.fromCharCode(65 + optIndex)}. ${content}` }} />
                                   {isCorrect && (
                                     <span className="text-green-600 text-sm ml-2">✓ Correct</span>
                                   )}
@@ -361,7 +363,7 @@ export default function CreateTestPage() {
                                 // if ans refers to an option id, find content
                                 const found = question.options?.find(o => (o.id ? o.id === ans : o === ans));
                                 const content = found ? (found.content || found) : ans;
-                                return <span dangerouslySetInnerHTML={{ __html: String(content) }} />;
+                                return <span dir="rtl" className="rtl-isolate" dangerouslySetInnerHTML={{ __html: String(content) }} />;
                               })()}
                             </p>
                           </div>

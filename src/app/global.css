@@ -20,4 +20,12 @@
   .input-field {
     @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500;
   }
+
+  
+  /* RTL isolate helper: forces punctuation to respect RTL direction inside the element */
+  .rtl-isolate {
+    direction: rtl;
+    text-align: right;
+    unicode-bidi: isolate-override;
+  }
 }
