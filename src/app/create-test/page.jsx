@@ -19,6 +19,7 @@ export default function CreateTestPage() {
   const [questions, setQuestions] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState(null);
+  const [formKey, setFormKey] = useState(0);
 
   if (!isAuthenticated) {
     router.push('/login');
@@ -31,7 +32,7 @@ export default function CreateTestPage() {
     toast.success('Basic info saved! Now add questions.');
   };
 
-  const handleAddQuestion = (question) => {
+  const handleAddQuestion = (question, keepOpen = false) => {
     if (editingQuestion) {
       const updatedQuestions = questions.map(q => 
         q.id === editingQuestion.id ? { ...question, id: q.id } : q
@@ -42,8 +43,15 @@ export default function CreateTestPage() {
       setQuestions([...questions, { ...question, id: Date.now().toString() }]);
       toast.success('Question added successfully!');
     }
-    setIsModalOpen(false);
+
     setEditingQuestion(null);
+    if (!keepOpen) {
+      setIsModalOpen(false);
+    } else {
+      // keep modal open for adding more; clear any editing state and reset form
+      setIsModalOpen(true);
+      setFormKey((k) => k + 1);
+    }
   };
 
   const handleEditQuestion = (question) => {
@@ -323,19 +331,22 @@ export default function CreateTestPage() {
                         {/* Render options for radio/checkbox */}
                         {(question.type === 'radio' || question.type === 'checkbox') && question.options && (
                           <div className="space-y-2 ml-2">
-                            {question.options.map((option, optIndex) => (
-                              <div key={optIndex} className="flex items-center gap-2">
-                                <span className="text-gray-600">
-                                  {question.type === 'radio' ? '◉' : '☐'}
-                                </span>
-                                <span className="text-gray-700">
-                                  {String.fromCharCode(65 + optIndex)}. {option}
-                                </span>
-                                {question.correctAnswers?.includes(option) && (
-                                  <span className="text-green-600 text-sm ml-2">✓ Correct</span>
-                                )}
-                              </div>
-                            ))}
+                            {question.options.map((option, optIndex) => {
+                              const content = typeof option === 'string' ? option : option.content;
+                              const id = typeof option === 'string' ? option : option.id;
+                              const isCorrect = (question.correctAnswers || []).includes(id) || (question.correctAnswers || []).includes(content);
+                              return (
+                                <div key={id || optIndex} className="flex items-center gap-2">
+                                  <span className="text-gray-600">
+                                    {question.type === 'radio' ? '◉' : '☐'}
+                                  </span>
+                                  <span className="text-gray-700" dangerouslySetInnerHTML={{ __html: `${String.fromCharCode(65 + optIndex)}. ${content}` }} />
+                                  {isCorrect && (
+                                    <span className="text-green-600 text-sm ml-2">✓ Correct</span>
+                                  )}
+                                </div>
+                              );
+                            })}
                           </div>
                         )}
 
@@ -343,7 +354,15 @@ export default function CreateTestPage() {
                         {question.type === 'text' && (
                           <div className="bg-gray-50 p-3 rounded mt-2">
                             <p className="text-sm text-gray-600">
-                              <strong>Expected Answer:</strong> {question.correctAnswers?.[0] || 'No answer key provided'}
+                              <strong>Expected Answer:</strong>{' '}
+                              {(() => {
+                                const ans = question.correctAnswers?.[0];
+                                if (!ans) return 'No answer key provided';
+                                // if ans refers to an option id, find content
+                                const found = question.options?.find(o => (o.id ? o.id === ans : o === ans));
+                                const content = found ? (found.content || found) : ans;
+                                return <span dangerouslySetInnerHTML={{ __html: String(content) }} />;
+                              })()}
                             </p>
                           </div>
                         )}
@@ -376,7 +395,8 @@ export default function CreateTestPage() {
         title={editingQuestion ? "Edit Question" : "Add New Question"}
       >
         <QuestionForm
-          onSubmit={handleAddQuestion}
+            key={editingQuestion ? editingQuestion.id : `new-${formKey}`}
+            onSubmit={handleAddQuestion}
           onCancel={() => {
             setIsModalOpen(false);
             setEditingQuestion(null);
