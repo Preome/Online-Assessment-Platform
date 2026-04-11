@@ -58,7 +58,7 @@ npm start
 ## 🤖 Additional Questions
 
 ### MCP Integration
-**No prior MCP experience in production projects.**
+**I haven’t directly worked with Model Context Protocol (MCP), but I’ve built systems that follow similar ideas—like integrating APIs, real-time data, chat systems, and backend services. For example, in Aponjon,CareerConnect and Nirapod project. I handled real-time communication, notifications, and service integration. So I’m confident I can quickly learn and work with MCP.**
 
 **Idea for this project:**
 - **Figma MCP**: Auto-import UI designs to generate Tailwind components/code for exam UI variants.
