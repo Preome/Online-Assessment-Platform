@@ -328,7 +328,7 @@ export default function CreateTestPage() {
                           </div>
                         </div>
 
-                        <h3 className="text-gray-800 mb-3 rtl-isolate" dangerouslySetInnerHTML={{ __html: question.title }} />
+                        <h3 className="text-gray-800 mb-3 text-left" dangerouslySetInnerHTML={{ __html: question.title }} />
 
                         {/* Render options for radio/checkbox */}
                         {(question.type === 'radio' || question.type === 'checkbox') && question.options && (
@@ -342,7 +342,7 @@ export default function CreateTestPage() {
                                   <span className="text-gray-600">
                                     {question.type === 'radio' ? '◉' : '☐'}
                                   </span>
-                                  <span dir="rtl" className="text-gray-700 rtl-isolate" dangerouslySetInnerHTML={{ __html: `${String.fromCharCode(65 + optIndex)}. ${content}` }} />
+                                  <span dir="ltr" className="text-gray-700" dangerouslySetInnerHTML={{ __html: `${String.fromCharCode(65 + optIndex)}. ${content}` }} />
                                   {isCorrect && (
                                     <span className="text-green-600 text-sm ml-2">✓ Correct</span>
                                   )}
@@ -363,7 +363,7 @@ export default function CreateTestPage() {
                                 // if ans refers to an option id, find content
                                 const found = question.options?.find(o => (o.id ? o.id === ans : o === ans));
                                 const content = found ? (found.content || found) : ans;
-                                return <span dir="rtl" className="rtl-isolate" dangerouslySetInnerHTML={{ __html: String(content) }} />;
+                                return <span dir="ltr" dangerouslySetInnerHTML={{ __html: String(content) }} />;
                               })()}
                             </p>
                           </div>
