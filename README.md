@@ -14,7 +14,8 @@ A full-stack online assessment/exam platform built with Next.js 14 (App Router),
 - Responsive UI with shadcn/ui-inspired components (Button, Card, Input, Modal)
 
 ## 🔗 Live Link
-[Link ](https://loom.com/share/...) 
+[Employer Login ](online-assessment-platform-rho.vercel.app) 
+[Candidate Login ](https://online-assessment-platform-rho.vercel.app/candidate/login) 
 
 ## 🔗 Video Demo
 [Watch demo ](https://drive.google.com/file/d/1dR9L3QT1AvyKAfnBxGw1HgjOYoy11rNE/view?usp=drive_link) 
