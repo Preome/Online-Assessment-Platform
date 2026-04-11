@@ -2,19 +2,14 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import useAuthStore from '@/store/authStore';
 
 export default function Home() {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const router = useRouter();
 
+  // Always send users to the login page by default
   useEffect(() => {
-    if (isAuthenticated) {
-      router.push('/dashboard');
-    } else {
-      router.push('/login');
-    }
-  }, [isAuthenticated, router]);
+    router.push('/login');
+  }, [router]);
 
   return null;
 }

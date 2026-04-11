@@ -13,10 +13,11 @@ A full-stack online assessment/exam platform built with Next.js 14 (App Router),
 - Secure exam env: Visibility API for tab switches, fullscreen enforcement, local progress save (localStorage)
 - Responsive UI with shadcn/ui-inspired components (Button, Card, Input, Modal)
 
-Current exam uses mock questions; extendable to real DB (Supabase/Prisma).
+## 🔗 Live Link
+[Link ](https://loom.com/share/...) 
 
-**Live Demo:** [Coming soon - Vercel/Netlify](#deploy)  
-**Video Demo:** [Coming soon - Loom/YouTube](#video-demo)
+## 🔗 Video Demo
+[Watch demo ](https://loom.com/share/...) 
 
 ## 📋 Setup Instructions
 
@@ -26,7 +27,7 @@ Current exam uses mock questions; extendable to real DB (Supabase/Prisma).
 ### Quick Start
 ```bash
 git clone <your-repo-url>
-cd \"Online Assessment Platform\"
+cd "Online Assessment Platform"
 npm install
 npm run dev
 ```
@@ -34,14 +35,8 @@ Open [http://localhost:3000](http://localhost:3000)
 
 **Login Credentials:**
 - Admin: `admin@akij.com` / `password123`
-- Candidate: Use any email/password (mock auth for demo)
+- Candidate: `candidate@example.com / candidate123`
 
-### Environment Variables
-```
-NEXT_PUBLIC_API_URL=http://localhost:3000/api
-# Add for production DB
-DATABASE_URL=your_supabase_url
-```
 
 ### Build & Deploy
 ```bash
@@ -49,8 +44,7 @@ npm run build
 npm start
 ```
 
-## 📱 Screenshots
-*(Add screenshots of dashboard, exam screen)*
+
 
 ## 🤖 Additional Questions
 
@@ -64,10 +58,8 @@ npm start
 Benefits: Faster iteration, realtime data, integrated testing.
 
 ### AI Tools for Development
-- **GitHub Copilot/Cursor**: Autocomplete for React/Next.js components, Zustand stores, Zod schemas – sped up 2x.
-- **Claude/ChatGPT**: Code review, generate test cases, refactor exam timer logic.
-- **VSCode Copilot Chat**: Inline debugging (e.g., visibilitychange issues).
-Recommendation: Cursor IDE + Claude for frontend; handles Tailwind/Zustand perfectly.
+- **GitHub Copilot**: Autocomplete for React/Next.js components, Zustand stores, Zod schemas – sped up 2x.
+
 
 ### Offline Mode
 **Current partial support:** Exam loads from localStorage, timer/answers persist client-side, works briefly offline.
@@ -79,25 +71,8 @@ Recommendation: Cursor IDE + Claude for frontend; handles Tailwind/Zustand perfe
 4. **UI Fallback**: Offline banner, cached timer persists, auto-resume.
 5. **Proctoring**: Local tab-switch count survives offline.
 
-Extend `examStore` with persist middleware; add SW in `next.config.js`.
 
-```
-npm i next-pwa dexie idb-keyval
-```
 
-## 🚀 Deploy
-
-### Vercel (Recommended)
-```bash
-npm i -g vercel
-vercel --prod
-```
-Add env vars in dashboard.
-
-### Netlify/DigitalOcean: Drag `out/` after `npm run build`.
-
-## 🔗 Video Demo
-[Watch demo →](https://loom.com/share/...) *(Record screen: npm run dev → full exam flow)*
 
 ## 📂 Project Structure
 ```
@@ -106,18 +81,8 @@ src/
 ├── components/   # UI (shadcn-inspired), forms, layout
 ├── store/        # Zustand: auth, exam
 └── lib/          # Validation schemas
+
 ```
 
-## Future Enhancements
-- Real backend (Supabase/Prisma) for questions/results.
-- Proctoring: Webcam/Copilot.ai integration.
-- PDF export for results.
-- Multi-language.
 
-## License
-MIT
-
----
-Built with ❤️ for Akij Resource. Questions? support@akj.work
-```
 

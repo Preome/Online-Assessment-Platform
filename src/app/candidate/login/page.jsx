@@ -10,18 +10,28 @@ export default function CandidateLoginPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  // Candidate credentials (use NEXT_PUBLIC_ env vars to override in development)
+  const CANDIDATE_EMAIL = process.env.NEXT_PUBLIC_CANDIDATE_EMAIL || 'candidate@example.com';
+  const CANDIDATE_PASSWORD = process.env.NEXT_PUBLIC_CANDIDATE_PASSWORD || 'candidate123';
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     
-    // Mock authentication for candidate
-    if (email && password) {
+    // Validate against configured candidate credentials
+    if (!email || !password) {
+      toast.error('Please enter email and password');
+      setLoading(false);
+      return;
+    }
+
+    if (email === CANDIDATE_EMAIL && password === CANDIDATE_PASSWORD) {
       localStorage.setItem('candidateEmail', email);
       localStorage.setItem('candidateName', 'Md. Naimur Rahman');
       toast.success('Login successful!');
       router.push('/candidate/dashboard');
     } else {
-      toast.error('Please enter email and password');
+      toast.error('Invalid email or password');
     }
     
     setLoading(false);
